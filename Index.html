@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>A Special Surprise For You</title>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pink-primary: #ff5e8e;
+      --pink-dark: #d6336c;
+      --pink-soft: #fff0f5;
+      --purple-night: #1d152b;
+      --card-bg: rgba(255, 255, 255, 0.92);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #ffe6ee 0%, #fff7fa 50%, #fce4ec 100%);
+      color: #4a3540;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background 0.8s ease;
+    }
+
+    body.night-mode {
+      background: radial-gradient(circle at top, #35244d 0%, #191126 100%);
+      color: #fff;
+    }
+
+    /* Floating Hearts Background */
+    .hearts-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .floating-heart {
+      position: absolute;
+      bottom: -30px;
+      font-size: 18px;
+      opacity: 0.45;
+      animation: floatUp linear infinite;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(0.8); opacity: 0; }
+      20% { opacity: 0.5; }
+      100% { transform: translateY(-110vh) scale(1.2); opacity: 0; }
+    }
+
+    /* Top Control Bar */
+    .top-bar {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .pill-control {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid #ffd1df;
+      color: #d6336c;
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(214, 51, 108, 0.12);
+    }
+
+    .pill-control.active-edit {
+      background: #2ecc71;
+      color: white;
+      border-color: #27ae60;
+    }
+
+    /* Main Container */
+    .app-container {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100dvh;
+      padding: 64px 20px 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeScale 0.5s ease forwards;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    @keyframes fadeScale {
+      from { opacity: 0; transform: translateY(14px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Calligraphy Heading */
+    .script-title {
+      font-family: 'Great Vibes', cursive;
+      font-size: 36px;
+      color: #d6336c;
+      line-height: 1.25;
+      margin-bottom: 14px;
+      text-shadow: 0 2px 10px rgba(255, 94, 142, 0.18);
+    }
+
+    .night-mode .script-title {
+      color: #ff9ebb;
+    }
+
+    .sub-text {
+      font-size: 14px;
+      color: #6e5260;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .night-mode .sub-text {
+      color: #e0cfe0;
+    }
+
+    /* Primary Pink Button */
+    .btn-pink {
+      background: linear-gradient(135deg, #ff6b98 0%, #ff477e 100%);
+      color: white;
+      border: none;
+      padding: 14px 30px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(255, 71, 126, 0.35);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      margin-top: 12px;
+    }
+
+    .btn-pink:active {
+      transform: scale(0.95);
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: #ff477e;
+      border: 1.5px solid #ffb3c6;
+      padding: 10px 22px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    /* Card Style */
+    .white-card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 24px 20px;
+      width: 100%;
+      box-shadow: 0 12px 32px rgba(214, 51, 108, 0.12);
+      border: 1px solid rgba(255, 182, 193, 0.5);
+      margin-bottom: 16px;
+    }
+
+    /* Screen 1: Gift Box */
+    .gift-card {
+      width: 220px;
+      height: 220px;
+      background: #fff;
+      border-radius: 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 12px 28px rgba(255, 94, 142, 0.18);
+      margin: 10px 0 22px;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+
+    .gift-card:hover {
+      transform: scale(1.03);
+    }
+
+    .gift-emoji {
+      font-size: 82px;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Screen 3: Countdown + Chat */
+    .timer-box {
+      background: rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 16px 32px;
+      border-radius: 20px;
+      font-size: 34px;
+      font-weight: 600;
+      color: #ff9ebb;
+      letter-spacing: 2px;
+      margin: 12px 0;
+    }
+
+    .progress-wrap {
+      width: 85%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 8px 0 16px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff758f, #ffccd5);
+      transition: width 0.5s linear;
+    }
+
+    .chat-box {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .chat-bubble {
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 13px;
+      text-align: left;
+      max-width: 85%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .chat-baby {
+      background: rgba(255, 117, 143, 0.32);
+      border: 1px solid rgba(255, 158, 187, 0.4);
+      align-self: flex-start;
+    }
+
+    .chat-you {
+      background: rgba(157, 129, 186, 0.32);
+      border: 1px solid rgba(200, 182, 255, 0.4);
+      align-self: flex-end;
+    }
+
+    .chat-sender {
+      font-size: 10px;
+      font-weight: 600;
+      opacity: 0.8;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    /* Screen 4: Bunting Flags */
+    .bunting {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .flag {
+      background: #ff758f;
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      width: 24px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
+    }
+
+    .flag:nth-child(even) {
+      background: #ffb3c6;
+      color: #800f2f;
+    }
+
+    /* Screen 6: Polaroid Gallery */
+    .polaroid-frame {
+      background: #fff;
+      padding: 14px 14px 24px;
+      border-radius: 18px;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.12);
+      width: 270px;
+      margin: 10px auto 16px;
+      transform: rotate(-1.5deg);
+      transition: transform 0.3s ease;
+    }
+
+    .polaroid-frame img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 12px;
+      background: #ffe5ec;
+      display: block;
+    }
+
+    .polaroid-caption {
+      font-family: 'Great Vibes', cursive;
+      font-size: 24px;
+      color: #d6336c;
+      margin-top: 10px;
+    }
+
+    /* Screen 7: Bouquet Notes */
+    .bouquet-area {
+      position: relative;
+      width: 100%;
+      min-height: 270px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 10px 0;
+    }
+
+    .bouquet-center {
+      font-size: 105px;
+      cursor: pointer;
+      animation: pulse 2s infinite;
+      user-select: none;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.07); }
+    }
+
+    .note-tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .note-pill {
+      background: #fff;
+      color: #c9184a;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      box-shadow: 0 4px 12px rgba(255, 71, 126, 0.15);
+      border: 1px solid #ffccd5;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .note-pill:active {
+      transform: scale(0.92);
+      background: #ffe5ec;
+    }
+
+    /* Screen 8: Envelope & Letter */
+    .envelope-box {
+      width: 260px;
+      height: 175px;
+      background: linear-gradient(135deg, #ff4d6d, #c9184a);
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      box-shadow: 0 14px 30px rgba(201, 24, 74, 0.3);
+      cursor: pointer;
+      margin: 16px auto;
+    }
+
+    .letter-paper {
+      display: none;
+      background: #fff9fb;
+      border: 2px dashed #ffb3c6;
+      border-radius: 20px;
+      padding: 22px;
+      text-align: left;
+      width: 100%;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    /* Editable highlight in Edit Mode */
+    [contenteditable="true"] {
+      outline: 2px dashed #2ecc71;
+      border-radius: 6px;
+      padding: 2px 4px;
+      background: rgba(46, 204, 113, 0.08);
+    }
+
+    /* Confetti Canvas */
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="confetti-canvas"></canvas>
+  <div class="hearts-bg" id="heartsBg"></div>
+
+  <!-- Optional Background Music -->
+  <audio id="bgMusic" loop>
+    <source src="music.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Top Controls -->
+  <div class="top-bar">
+    <button class="pill-control" onclick="prevScreen()">← Back</button>
+    <button class="pill-control" id="musicBtn" onclick="toggleMusic()">🎵 Music</button>
+    <button class="pill-control" id="editBtn" onclick="toggleEditMode()">✏️ Edit Text</button>
+  </div>
+
+  <div class="app-container">
+
+    <!-- SCREEN 1: Teaser Box -->
+    <div class="screen active" id="screen1">
+      <h1 class="script-title editable">Something magical is waiting for you...</h1>
+      <div class="gift-card" onclick="openGiftBox()">
+        <div class="gift-emoji" id="giftEmoji">🎁</div>
+        <p style="font-size:12px; color:#ff5e8e; margin-top:8px;" id="giftHint">Tap the gift box!</p>
+      </div>
+      <p class="sub-text editable">Are you excited for what's next? 😊</p>
+      <button class="btn-pink" onclick="startJourney()">YES! ✨</button>
+    </div>
+
+    <!-- SCREEN 2: Intro -->
+    <div class="screen" id="screen2">
+      <div style="font-size: 64px; margin-bottom: 10px;">🧸💖</div>
+      <h1 class="script-title editable">A Special Surprise Awaits!</h1>
+      <p class="sub-text editable">Only for the most amazing person in the world... YOU!</p>
+      <button class="btn-pink" onclick="goToCountdown()">Start My Surprise 🚀</button>
+    </div>
+
+    <!-- SCREEN 3: Midnight Countdown -->
+    <div class="screen" id="screen3">
+      <div style="font-size: 56px;">🕯️🥂🧸</div>
+      <div class="timer-box" id="timerDisplay">00:10</div>
+      <div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
+      <p class="sub-text editable" style="margin-bottom:8px;">Gift will open only after 12 AM ✨</p>
+      <button class="btn-pink" style="padding:9px 20px; font-size:13px;" onclick="skipTimer()">Tap me! 🎁</button>
+
+      <div class="chat-box">
+        <div class="chat-bubble chat-baby">
+          <span class="chat-sender">BABY</span>
+          <span class="editable">Wait till it's 12 AM, my love 💕</span>
+        </div>
+        <div class="chat-bubble chat-you">
+          <span class="chat-sender">YOU</span>
+          <span class="editable">I can't wait!!! 🤗</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: Happy Birthday Banner -->
+    <div class="screen" id="screen4">
+      <div class="bunting">
+        <div class="flag">H</div><div class="flag">A</div><div class="flag">P</div><div class="flag">P</div><div class="flag">Y</div>
+        <div style="width:8px;"></div>
+        <div class="flag">B</div><div class="flag">I</div><div class="flag">R</div><div class="flag">T</div><div class="flag">H</div><div class="flag">D</div><div class="flag">A</div><div class="flag">Y</div>
+      </div>
+      <h1 class="script-title editable">A Cutiepie Was Born 18 Years Ago</h1>
+      <p class="sub-text editable">And today, the world celebrates the most wonderful soul!</p>
+      <div style="font-size: 84px; margin: 10px 0;">🎂</div>
+      <button class="btn-pink" onclick="nextScreen()">Read Special Note 💌</button>
+    </div>
+
+    <!-- SCREEN 5: Poem / Shayari Card -->
+    <div class="screen" id="screen5">
+      <h1 class="script-title editable">For You, My Everything</h1>
+      <div class="white-card">
+        <p class="sub-text editable" style="margin-bottom:0; color:#4a3540;">
+          In the quiet of the midnight sky,<br><br>
+          I find my heart beating only for you.<br><br>
+          You are the star that lights my darkest night,<br><br>
+          Every moment with you feels like a dream.<br><br>
+          Happy Birthday, my forever and always! 💖
+        </p>
+      </div>
+      <button class="btn-pink" onclick="nextScreen()">Let's Celebrate 🎉</button>
+    </div>
+
+    <!-- SCREEN 6: Polaroid Photo Stack -->
+    <div class="screen" id="screen6">
+      <h1 class="script-title editable">Our Beautiful Journey</h1>
+      <p class="sub-text editable" style="margin-bottom:6px;">Every moment with you is a treasure ✨</p>
+
+      <div class="polaroid-frame">
+        <img id="polaroidImg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><rect width='100%' height='100%' fill='%23ffe5ec'/><text x='50%' y='48%' font-size='54' text-anchor='middle'>📸</text><text x='50%' y='62%' font-size='16' fill='%23d6336c' font-family='sans-serif' text-anchor='middle'>Tap Add Photos Below</text></svg>" alt="Memory">
+        <div class="polaroid-caption editable" id="polaroidCaption">Our First Date 💕</div>
+      </div>
+
+      <input type="file" id="photoUpload" accept="image/*" multiple style="display:none;" onchange="handlePhotos(event)">
+      <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+        <button class="btn-secondary" onclick="document.getElementById('photoUpload').click()">➕ Add Photos</button>
+        <button class="btn-secondary" onclick="nextPhoto()">Next Photo 📸</button>
+      </div>
+
+      <button class="btn-pink" onclick="nextScreen()">Your Rose Bouquet 💐</button>
+    </div>
+
+    <!-- SCREEN 7: Rose Bouquet -->
+    <div class="screen" id="screen7">
+      <h1 class="script-title editable">A Bouquet For The One Who Owns My Heart</h1>
+      <div class="bouquet-area">
+        <div class="bouquet-center" onclick="burstConfetti()">💐</div>
+        <div class="note-tags">
+          <div class="note-pill editable" onclick="burstConfetti()">Forever yours 💕</div>
+          <div class="note-pill editable" onclick="burstConfetti()">I'm lucky to have you ✨</div>
+          <div class="note-pill editable" onclick="burstConfetti()">You are my sunshine ☀️</div>
+          <div class="note-pill editable" onclick="burstConfetti()">You make my world brighter 🌟</div>
+          <div class="note-pill editable" onclick="burstConfetti()">Happy Birthday my love 🎂</div>
+        </div>
+      </div>
+      <button class="btn-pink" onclick="nextScreen()">Read My Heart 💌</button>
+    </div>
+
+    <!-- SCREEN 8: Locked Love Letter -->
+    <div class="screen" id="screen8">
+      <h1 class="script-title editable">A letter from my heart...</h1>
+
+      <div class="envelope-box" id="envelopeBox" onclick="unlockLetter()">
+        <div style="font-size: 46px;">🔒</div>
+        <p style="font-size: 13px; margin-top: 8px;">Tap to open 💌</p>
+      </div>
+
+      <div class="letter-paper" id="letterPaper">
+        <h2 class="script-title editable" style="font-size:28px;">To My Dearest,</h2>
+        <p class="sub-text editable" style="color:#4a3540;">
+          My Love,<br><br>
+          Happy Birthday my princess! Thank you for filling my life with endless smiles, warmth, and love. May all your dreams come true today and always. ❤️
+        </p>
+        <p class="script-title editable" style="font-size:24px; text-align:right; margin-bottom:0;">With all my heart, My Love</p>
+      </div>
+
+      <button class="btn-pink" id="letterNextBtn" style="display:none;" onclick="nextScreen()">One Last Message ✨</button>
+    </div>
+
+    <!-- SCREEN 9: Final Message -->
+    <div class="screen" id="screen9">
+      <div style="font-size: 68px; margin-bottom: 10px;">🐻💖🐼</div>
+      <div class="white-card">
+        <div style="font-size: 36px; margin-bottom: 8px;">🎂</div>
+        <p class="sub-text editable" style="color:#4a3540;">
+          And once again... the world got lucky the day you were born! Because no matter how many stars shine in the sky, none shines brighter than you.
+        </p>
+        <h2 class="script-title editable" style="font-size:30px; margin-bottom:0;">♡ Happy Birthday ♡</h2>
+      </div>
+      <button class="btn-pink" onclick="restartAll()">Start Over 🔄</button>
+    </div>
+
+  </div>
+
+  <script>
+    let currentScreen = 1;
+    const totalScreens = 9;
+    let isEditMode = false;
+    let countdownInterval = null;
+
+    // Floating Hearts Generator
+    const heartsBg = document.getElementById('heartsBg');
+    const heartSymbols = ['💖', '💕', '💗', '🌸', '✨'];
+    for (let i = 0; i < 18; i++) {
+      const h = document.createElement('div');
+      h.className = 'floating-heart';
+      h.textContent = heartSymbols[i % heartSymbols.length];
+      h.style.left = Math.random() * 100 + 'vw';
+      h.style.animationDuration = (6 + Math.random() * 7) + 's';
+      h.style.animationDelay = (Math.random() * 5) + 's';
+      heartsBg.appendChild(h);
+    }
+
+    function showScreen(num) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen' + num).classList.add('active');
+      currentScreen = num;
+
+      if (num === 3) {
+        document.body.classList.add('night-mode');
+      } else {
+        document.body.classList.remove('night-mode');
+      }
+
+      if (num === 4 || num === 9) {
+        burstConfetti();
+      }
+    }
+
+    function nextScreen() {
+      if (currentScreen < totalScreens) {
+        showScreen(currentScreen + 1);
+      }
+    }
+
+    function prevScreen() {
+      if (currentScreen > 1) {
+        clearInterval(countdownInterval);
+        showScreen(currentScreen - 1);
+      }
+    }
+
+    // Screen 1 Gift Box Animation
+    function openGiftBox() {
+      const emoji = document.getElementById('giftEmoji');
+      const hint = document.getElementById('giftHint');
+      emoji.textContent = '🐶💖';
+      emoji.style.transform = 'scale(1.25)';
+      hint.textContent = 'Surprise!! Tap YES below';
+      burstConfetti();
+    }
+
+    // Start Journey & Try Playing Music
+    function startJourney() {
+      const audio = document.getElementById('bgMusic');
+      audio.play().catch(() => {});
+      nextScreen();
+    }
+
+    function toggleMusic() {
+      const audio = document.getElementById('bgMusic');
+      const btn = document.getElementById('musicBtn');
+      if (audio.paused) {
+        audio.play().then(() => btn.textContent = '⏸️ Pause').catch(() => alert('Apne folder me music.mp3 file add karein!'));
+      } else {
+        audio.pause();
+        btn.textContent = '🎵 Music';
+      }
+    }
+
+    // Screen 3 Countdown Logic (10 sec demo timer)
+    function goToCountdown() {
+      showScreen(3);
+      let total = 10;
+      let left = total;
+      const display = document.getElementById('timerDisplay');
+      const fill = document.getElementById('progressFill');
+      fill.style.width = '0%';
+
+      clearInterval(countdownInterval);
+      countdownInterval = setInterval(() => {
+        left--;
+        display.textContent = '00:' + (left < 10 ? '0' + left : left);
+        fill.style.width = (((total - left) / total) * 100) + '%';
+        if (left <= 0) {
+          clearInterval(countdownInterval);
+          showScreen(4);
+        }
+      }, 1000);
+    }
+
+    function skipTimer() {
+      clearInterval(countdownInterval);
+      showScreen(4);
+    }
+
+    // Screen 6 Photo Gallery Upload & Switch
+    let uploadedPhotos = [];
+    let photoIndex = 0;
+    const defaultCaptions = ['Our First Date 💕', 'That Special Night ✨', 'My Favorite Smile 😊', 'Forever Memories 💖'];
+
+    function handlePhotos(event) {
+      const files = Array.from(event.target.files);
+      if (!files.length) return;
+      uploadedPhotos = files.map(file => URL.createObjectURL(file));
+      photoIndex = 0;
+      updatePolaroid();
+    }
+
+    function nextPhoto() {
+      if (uploadedPhotos.length > 0) {
+        photoIndex = (photoIndex + 1) % uploadedPhotos.length;
+        updatePolaroid();
+      } else {
+        const cap = document.getElementById('polaroidCaption');
+        photoIndex = (photoIndex + 1) % defaultCaptions.length;
+        cap.textContent = defaultCaptions[photoIndex];
+      }
+    }
+
+    function updatePolaroid() {
+      document.getElementById('polaroidImg').src = uploadedPhotos[photoIndex];
+      document.getElementById('polaroidCaption').textContent = defaultCaptions[photoIndex % defaultCaptions.length];
+    }
+
+    // Screen 8 Unlock Letter
+    function unlockLetter() {
+      document.getElementById('envelopeBox').style.display = 'none';
+      document.getElementById('letterPaper').style.display = 'block';
+      document.getElementById('letterNextBtn').style.display = 'inline-block';
+      burstConfetti();
+    }
+
+    // Edit Mode Toggle (Direct phone text editing)
+    function toggleEditMode() {
+      isEditMode = !isEditMode;
+      const btn = document.getElementById('editBtn');
+      document.querySelectorAll('.editable').forEach(el => {
+        el.contentEditable = isEditMode;
+      });
+      if (isEditMode) {
+        btn.textContent = '✅ Done';
+        btn.classList.add('active-edit');
+      } else {
+        btn.textContent = '✏️ Edit Text';
+        btn.classList.remove('active-edit');
+      }
+    }
+
+    function restartAll() {
+      document.getElementById('envelopeBox').style.display = 'flex';
+      document.getElementById('letterPaper').style.display = 'none';
+      document.getElementById('letterNextBtn').style.display = 'none';
+      showScreen(1);
+    }
+
+    // Simple Confetti Effect
+    function burstConfetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const pieces = [];
+      const colors = ['#ff477e', '#ff85a1', '#fbb1bd', '#ffd166', '#9d4edd'];
+
+      for (let i = 0; i < 65; i++) {
+        pieces.push({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          vx: (Math.random() - 0.5) * 14,
+          vy: (Math.random() - 0.7) * 14,
+          size: 6 + Math.random() * 6,
+          color: colors[i % colors.length],
+          alpha: 1
+        });
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let active = false;
+        pieces.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.35;
+          p.alpha -= 0.018;
+          if (p.alpha > 0) {
+            active = true;
+            ctx.globalAlpha = p.alpha;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x, p.y, p.size, p.size);
+          }
+        });
+        if (active) requestAnimationFrame(animate);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      animate();
+    }
+  </script>
+</body>
+</html>
